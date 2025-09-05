@@ -1,0 +1,16 @@
+{
+  "name": "QuickWin Programming",
+  "short_name": "QW Programming",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0f0e",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "/assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "lang": "de"
+}

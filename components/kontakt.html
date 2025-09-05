@@ -1,0 +1,34 @@
+<section id='kontakt' class='section contact'>
+  <div class='container'>
+    <h2>Kontakt</h2>
+    <p class='sublead'>Lassen Sie uns in einem 30‑minütigen Gespräch Ihre Quick‑Win‑Potenziale identifizieren.</p>
+    <div class='contact-grid'>
+      <form class='card contact-form' id='contactForm' onsubmit='handleContact(event)'>
+        <div class='grid two'>
+          <label>Ihr Name<input type='text' name='name' required></label>
+          <label>E‑Mail<input type='email' name='email' required></label>
+          <label>Unternehmen<input type='text' name='company'></label>
+          <label>Telefon (optional)<input type='tel' name='phone'></label>
+        </div>
+        <label>Interessen (optional)
+          <div class='chip-row'>
+            <label class='chip'><input type='checkbox' name='interest' value='Excel/Access'> Excel/Access</label>
+            <label class='chip'><input type='checkbox' name='interest' value='Dashboards'> Dashboards</label>
+            <label class='chip'><input type='checkbox' name='interest' value='Web-Apps'> Web‑Apps</label>
+            <label class='chip'><input type='checkbox' name='interest' value='Mobile'> Mobile</label>
+          </div>
+        </label>
+        <label>Ihr Anliegen<textarea name='message' rows='6' required></textarea></label>
+        <label class='consent'><input type='checkbox' required> Ich stimme zu, dass meine Angaben zur Beantwortung der Anfrage verarbeitet werden.</label>
+        <div class='cta-row'><button class='btn btn-cta' type='submit'>Anfrage senden</button></div>
+        <p class='muted small'>Hinweis: Der Versand nutzt aktuell Mailto‑Fallback. Serverlosen Versand (z. B. Formspree) integrieren wir gern.</p>
+      </form>
+      <div class='card contact-info'>
+        <h3>Direktkontakt</h3>
+        <p><strong>E‑Mail:</strong> <a id='contactEmailLink' href='mailto:hello@quickwin-solutions.example'>hello@quickwin-solutions.example</a></p>
+        <p><strong>Telefon:</strong> <span id='contactPhone'>+49 000 000000</span></p>
+        <p><strong>Adresse:</strong> <span id='contactAddress'>Musterstraße 1, 12345 Musterstadt</span></p>
+      </div>
+    </div>
+  </div>
+</section>
