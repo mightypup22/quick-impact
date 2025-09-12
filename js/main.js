@@ -1,6 +1,7 @@
+window.__BUILD_ID__="2025-09-12T20:33:09Z";function bust(u){const s=u.includes('?')?'&':'?';return u+s+'v='+encodeURIComponent(window.__BUILD_ID__)};
 // main.js (ES module)
 const CONFIG={
-  brandName:'QuickImpact Programming',
+  brandName:'Quick Impact Programming',
   contactEmail:'hello@quickwin-solutions.example',
   phone:'+49 000 000000',
   address:'Musterstraße 1, 12345 Musterstadt'
@@ -328,24 +329,4 @@ initHeader();
   }catch(e){ console.error('TeamSlider Modul konnte nicht geladen werden', e); }
   fixSectionLinks(); initFlowLine(); initSmartHeader(); initTeamSlider(); window.addEventListener('resize', initFlowLine, {passive:true});
 });
-
-// ensure logo svg on all viewports
-(function forceSvgLogo(){
-  function apply(){
-    var nodes = [
-      document.querySelector('#site-logo'),
-      document.querySelector('#footer-logo'),
-      document.querySelector('.brand img'),
-      document.querySelector('.footer-logo')
-    ].filter(Boolean);
-    nodes.forEach(function(img){
-      if (img.getAttribute('srcset')) img.removeAttribute('srcset');
-      if (img.getAttribute('sizes')) img.removeAttribute('sizes');
-      var cur = img.getAttribute('src')||'';
-      if (!/assets\/logo\.svg$/i.test(cur)) img.setAttribute('src','assets/logo.svg');
-    });
-  }
-  document.addEventListener('DOMContentLoaded', apply);
-  window.addEventListener('load', apply);
-  window.addEventListener('resize', apply);
-})();
+if('serviceWorker'in navigator){navigator.serviceWorker.getRegistrations().then(r=>r.forEach(x=>x.unregister())).catch(()=>{});}
