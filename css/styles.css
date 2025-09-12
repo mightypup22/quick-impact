@@ -657,3 +657,9 @@ html,body{ overflow-x:hidden; }
   .footer-legal{ order: 2; margin-left: 0; justify-content: center; }
   .footer-brand{ order: 3; justify-content: center; }
 }
+
+/* Force logo svg hardening */
+.brand img, .footer-logo { content: normal !important; background: none !important; background-image: none !important; }
+@media (max-width:760px){
+  .brand img, .footer-logo { content: normal !important; background: none !important; background-image: none !important; }
+}
