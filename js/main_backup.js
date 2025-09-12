@@ -303,23 +303,7 @@ function initSmartHeader(){
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadComponents();
-  
-  // Jump to hash after components are included (for visits from legal pages)
-  if (location.hash) {
-    const hash = decodeURIComponent(location.hash);
-    let tries = 0;
-    const seek = () => {
-      const el = document.querySelector(hash);
-      if (el) {
-        el.scrollIntoView({behavior:'auto', block:'start'});
-      } else if (tries++ < 40) {
-        requestAnimationFrame(seek);
-      }
-    };
-    requestAnimationFrame(seek);
-  }
-
-initHeader();
+  initHeader();
   initContactForm();
   initHeroCanvas();
   try{

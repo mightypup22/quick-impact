@@ -1,26 +1,35 @@
-<section id='kontakt' class='section contact'>
-  <div class='container'>
+<section class="section contact" id="kontakt">
+  <div class="container">
     <h2>Kontakt</h2>
-    <p class='sublead'>Lassen Sie uns in einem 30‑minütigen Gespräch Ihre Quick‑Win‑Potenziale identifizieren.</p>
-    <div class='contact-grid'>
-      <form class='card contact-form' id='contactForm' onsubmit='handleContact(event)'>
-        <div class='grid two'>
-          <label>Ihr Name<input type='text' name='name' required></label>
-          <label>E‑Mail<input type='email' name='email' required></label>
-          <label>Unternehmen<input type='text' name='company'></label>
-          <label>Telefon (optional)<input type='tel' name='phone'></label>
+    <form id="contact-form" class="contact-formv3" method="post" action="#" novalidate>
+      <div class="cf3-grid">
+        <!-- Row 1 (Desktop): Name + Email -->
+        <div class="field">
+          <label for="name">Ihr Name</label>
+          <input type="text" id="name" name="name" autocomplete="name" required placeholder="Max Mustermann">
         </div>
-<label>Ihr Anliegen<textarea name='message' rows='6' required></textarea></label>
-        <label class='consent'><input type='checkbox' required> Ich stimme zu, dass meine Angaben zur Beantwortung der Anfrage verarbeitet werden.</label>
-        <div class='cta-row'><button class='btn btn-cta' type='submit'>Anfrage senden</button></div>
-        <p class='muted small'>Hinweis: Der Versand nutzt aktuell Mailto‑Fallback. Serverlosen Versand (z. B. Formspree) integrieren wir gern.</p>
-      </form>
-      <div class='card contact-info'>
-        <h3>Direktkontakt</h3>
-        <p><strong>E‑Mail:</strong> <a id='contactEmailLink' href='mailto:hello@quickwin-solutions.example'>hello@quickwin-solutions.example</a></p>
-        <p><strong>Telefon:</strong> <span id='contactPhone'>+49 000 000000</span></p>
-        <p><strong>Adresse:</strong> <span id='contactAddress'>Musterstraße 1, 12345 Musterstadt</span></p>
+        <div class="field">
+          <label for="email">E‑Mail-Adresse</label>
+          <input type="email" id="email" name="email" autocomplete="email" required placeholder="name@firma.de">
+        </div>
+
+        <!-- Row 2: Ihr Anliegen (full width) -->
+        <div class="field full">
+          <label for="message">Ihr Anliegen</label>
+          <textarea id="message" name="message" rows="6" required placeholder="Beschreiben Sie kurz Ihr Vorhaben …"></textarea>
+        </div>
+
+        <!-- Row 3: Consent (full width) -->
+        <div class="field full consent">
+          <input type="checkbox" id="consent" name="consent" required>
+          <label for="consent">Ich bin einverstanden, dass QuickImpact Programming mich zur Beantwortung meiner Anfrage kontaktiert. Hinweise zu Widerruf und Datenschutz finden Sie in unserer <a href="datenschutz.html">Datenschutzerklärung</a>.</label>
+        </div>
+
+        <!-- Row 4: Submit (full width) -->
+        <div class="actions full">
+          <button type="submit" class="btn btn-cta">Absenden</button>
+        </div>
       </div>
-    </div>
+    </form>
   </div>
 </section>

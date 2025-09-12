@@ -259,3 +259,401 @@ html, body{ overflow-x: hidden; }
   .site-footer .links a, .site-footer nav a, .site-footer .footer-nav a, .site-footer .legal-links a { letter-spacing: 0; }
 }
 
+
+/* ---- comprehensive patches ---- */
+
+/* === Global safety === */
+*,*::before,*::after{ box-sizing: border-box; }
+html,body{ overflow-x:hidden; }
+
+/* === Contact form fixes === */
+.contact-form{ padding-left:0 !important; width:100%; max-width:100%; }
+@media (max-width:980px){ .contact .contact-grid{ grid-template-columns:1fr !important; } }
+@media (max-width:640px){ .contact-form .grid.two{ grid-template-columns:1fr !important; } }
+
+/* Spacing before message field */
+.contact-form label[for="message"]{ margin-top: 1rem; display:block; }
+.contact-form #message{ margin-top: .45rem; }
+.contact-form textarea{ width:100%; max-width:100%; margin-top:.45rem; }
+.contact-form label + input,
+.contact-form label + textarea,
+.contact-form label + select{ margin-top: .45rem; }
+.contact-form .form-row{ margin-bottom: 1rem; }
+
+/* Checkbox alignment */
+.contact-form input[type="checkbox"]{
+  position: static !important;
+  transform: none !important;
+  margin: 0 .55rem 0 0 !important;
+  vertical-align: middle;
+}
+.contact-form label[for="consent"],
+.contact-form .consent,
+.contact-form .consent-row,
+.contact-form .checkbox-line{ display:inline-flex; align-items:center; gap:.55rem; }
+
+/* === Hero visual cap on mobile === */
+@media (max-width: 980px){
+  .hero .hero-visual,
+  .hero .visual,
+  .hero .illustration,
+  .hero .visual-wrap,
+  .hero canvas,
+  .hero img,
+  .hero video{
+    max-height:50vh !important;
+    height:auto;
+    object-fit:contain;
+  }
+  .hero .visual-wrap{ overflow:hidden; }
+}
+
+/* === Footer layout: normal on desktop, two rows on mobile (links row nowrap) === */
+.footer-wrap{display:grid; grid-template-columns:1fr; row-gap:.6rem; align-items:center; justify-items:center}
+.footer-links{display:flex; gap:1rem; align-items:center; justify-content:center}
+.footer-brand{display:flex; gap:.6rem; align-items:center; justify-content:center}
+.footer-logo.is-hidden{display:none}
+.footer-brand.no-logo{gap:.25rem}
+@media (max-width:699px){
+  .footer-links{white-space:nowrap; flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none}
+  .footer-links::-webkit-scrollbar{display:none}
+}
+@media (min-width:700px){
+  .footer-wrap{grid-template-columns: 1fr auto; column-gap:1rem}
+  .footer-links{justify-content:flex-start; flex-wrap:wrap; white-space:normal}
+  .footer-brand{justify-content:flex-end}
+}
+
+/* ---- v4 contact & logo unification ---- */
+
+/* === v4: Contact form vertical rhythm & consent alignment === */
+/* Push the message block ("Ihr Anliegen") ~10px lower than the previous input group */
+.contact-form label[for="message"]{ margin-top: 10px !important; display:block; }
+.contact-form #message{ margin-top: 6px !important; }
+.contact-form textarea:first-of-type{ margin-top: 6px !important; display:block; }
+/* Fallbacks for various structures */
+.contact-form .message-row,
+.contact-form .message,
+.contact-form .field.message,
+.contact-form .form-row.message{ margin-top: 10px !important; }
+
+/* Consent row: checkbox on the left, text with ~20px spacing to the right */
+.contact-form label[for="consent"],
+.contact-form .consent,
+.contact-form .consent-row,
+.contact-form .checkbox-line{
+  display: flex !important;
+  align-items: center !important;
+  column-gap: 20px !important;
+  row-gap: 6px;
+}
+.contact-form input[type="checkbox"]{
+  position: static !important;
+  transform: none !important;
+  margin: 0 !important;
+  flex: 0 0 auto;
+}
+
+/* Keep hero mobile cap from v3 */
+@media (max-width: 980px){
+  .hero .hero-visual,
+  .hero .visual,
+  .hero .illustration,
+  .hero .visual-wrap,
+  .hero canvas,
+  .hero img,
+  .hero video{
+    max-height:50vh !important;
+    height:auto;
+    object-fit:contain;
+  }
+  .hero .visual-wrap{ overflow:hidden; }
+}
+
+/* ---- v5 contact form fixes ---- */
+
+/* === v5: Contact consent under message; left-aligned checkbox + text === */
+.contact-form label[for="message"]{ margin-top: 10px !important; display:block; }
+.contact-form #message{ margin-top: 6px !important; }
+.contact-form textarea:first-of-type{ margin-top: 6px !important; display:block; }
+
+.contact-form .consent-row{
+  display:flex !important;
+  align-items:flex-start !important;
+  column-gap:20px !important;
+  margin-top:.9rem;
+}
+.contact-form .consent-row input[type="checkbox"]{
+  margin: .2rem 0 0 0 !important;
+  flex:0 0 auto;
+}
+.contact-form .consent-row label{
+  flex:1 1 auto;
+  line-height:1.45;
+  margin:0;
+  text-align:left;
+}
+
+/* ---- contact form v2 styles ---- */
+
+/* === Contact Form v2 (clean rebuild) === */
+.contact-formv2{ max-width: 760px; padding: 0; margin: 0; }
+.cf-grid{ display: grid; grid-template-columns: 1fr 1fr; column-gap: 1.2rem; row-gap: 1.1rem; }
+.cf-grid .full{ grid-column: 1 / -1; }
+
+.contact-formv2 .form-field label{
+  display:block; font-weight:600; margin: 0 0 .5rem 0;
+}
+.contact-formv2 input[type="text"],
+.contact-formv2 input[type="email"],
+.contact-formv2 textarea{
+  width:100%; max-width:100%;
+  padding: .85rem .95rem;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+  color: inherit;
+  outline: none;
+}
+.contact-formv2 input::placeholder,
+.contact-formv2 textarea::placeholder{ opacity:.75 }
+
+.contact-formv2 input:focus,
+.contact-formv2 textarea:focus{
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16,185,129,.2);
+}
+
+/* Consent row: checkbox left, text right */
+.contact-formv2 .consent-row{
+  display:flex; align-items:flex-start; column-gap: 20px;
+}
+.contact-formv2 .consent-row input[type="checkbox"]{
+  margin-top: .3rem;
+}
+.contact-formv2 .consent-row label{ line-height:1.5; }
+
+/* Actions */
+.qip-btn{
+  display:inline-block; padding:.9rem 1.15rem; border-radius:12px;
+  background:#10b981; color:#0a0f0e; border:none; font-weight:700; cursor:pointer;
+  transition: transform .15s ease, opacity .15s ease;
+}
+.qip-btn:hover{ transform: translateY(-1px); opacity:.95 }
+.qip-btn:active{ transform: translateY(0) scale(.98) }
+
+/* Mobile */
+@media (max-width: 860px){
+  .cf-grid{ grid-template-columns: 1fr; }
+  .contact-formv2{ max-width: 100%; }
+}
+
+/* ---- v7: consent alignment fixes ---- */
+
+/* === v7: Consent directly under textarea, left-aligned === */
+.contact .contact-formv2 .cf-grid{
+  align-items:start !important;
+  justify-items:start !important;
+}
+
+.contact-formv2 .form-field{ display:flex; flex-direction:column; }
+
+/* Ensure the consent row spans full width and starts from the left edge */
+.contact-formv2 .consent-row{
+  grid-column: 1 / -1 !important;
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:flex-start !important;
+  gap: .75rem !important;
+  margin-top: 1rem !important;
+  margin-left: 0 !important;
+  width: 100% !important;
+  text-align:left !important;
+  flex-wrap: nowrap !important;
+}
+
+.contact-formv2 .consent-row input[type="checkbox"]{
+  flex: 0 0 auto !important;
+  margin-top: .25rem !important;
+}
+
+.contact-formv2 .consent-row label{
+  flex: 1 1 auto !important;
+  margin: 0 !important;
+  max-width: 100% !important;
+  white-space: normal !important;
+  text-align: left !important;
+}
+
+/* Prevent any inherited right alignment */
+.contact .contact-formv2, 
+.contact .contact-formv2 *{
+  text-align: left !important;
+}
+
+/* ---- contact form v3 styles ---- */
+
+/* === Contact Form v3: 4-row desktop layout, responsive === */
+.contact .contact-formv3{ max-width: 860px; margin: 0; padding: 0; }
+.cf3-grid{ 
+  display:grid; 
+  grid-template-columns: minmax(0,1fr) minmax(0,1fr); 
+  column-gap: 1.2rem; 
+  row-gap: 1.1rem; 
+  align-items:start; 
+  justify-items:stretch;
+}
+.cf3-grid .full{ grid-column: 1 / -1; }
+.contact-formv3 .field{ display:flex; flex-direction:column; }
+
+.contact-formv3 label{ display:block; font-weight:600; margin:0 0 .55rem 0; }
+.contact-formv3 input[type="text"],
+.contact-formv3 input[type="email"],
+.contact-formv3 textarea{
+  width:100%; max-width:100%;
+  padding:.9rem 1rem;
+  border:1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.03);
+  border-radius:12px;
+  color:inherit;
+  outline:none;
+}
+.contact-formv3 input::placeholder,
+.contact-formv3 textarea::placeholder{ opacity:.75 }
+
+.contact-formv3 input:focus,
+.contact-formv3 textarea:focus{
+  border-color:#10b981;
+  box-shadow:0 0 0 3px rgba(16,185,129,.2);
+}
+
+/* Consent row: checkbox left, text right; clean left alignment */
+.contact-formv3 .consent{
+  flex-direction:row;
+  align-items:flex-start;
+  gap:.75rem;
+}
+.contact-formv3 .consent input[type="checkbox"]{ margin-top:.25rem; }
+.contact-formv3 .consent label{ margin:0; line-height:1.5; text-align:left; }
+
+/* Actions */
+.contact-formv3 .actions{ margin-top:.2rem; }
+.qip-btn{
+  display:inline-block; padding:.95rem 1.2rem; border-radius:12px;
+  background:#10b981; color:#0a0f0e; border:none; font-weight:700; cursor:pointer;
+  transition: transform .15s ease, opacity .15s ease;
+}
+.qip-btn:hover{ transform:translateY(-1px); opacity:.95 }
+.qip-btn:active{ transform:translateY(0) scale(.98) }
+
+/* Mobile: stack into single column */
+@media (max-width: 860px){
+  .cf3-grid{ grid-template-columns: 1fr; }
+  .contact .contact-formv3{ max-width:100%; }
+}
+@media (min-width: 981px){
+  .no-wrap{ white-space: nowrap; }
+}
+.site-footer{ padding: 20px 0; }
+/* Rahmen-Container clippt das Bild an den Rundungen */
+/* --- Teamfoto: Rahmenfüllend & sauber gecroppt --- */
+.tv3-figure{
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 340px;         /* optional, je nach Layout */
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;      /* Desktop-Format */
+  background: transparent;  /* nur zur Sicherheit */
+}
+
+/* Bild füllt den Container vollständig */
+.tv3-figure img{
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center;
+}
+
+/* Falls irgendwo .fade-img ein "contain" setzt: hart überschreiben */
+.tv3-figure img.fade-img{
+  object-fit: cover !important;
+}
+
+/* Fallback für Browser ohne aspect-ratio (selten, aber sicher ist sicher) */
+@supports not (aspect-ratio: 1 / 1){
+  .tv3-figure{ height: 0; padding-top: 75%; } /* 4:3 => 75% */
+  .tv3-figure img{ position: absolute; inset: 0; }
+}
+
+/* Mobile: quadratisch, etwas kleiner */
+@media (max-width: 980px){
+  .tv3-figure{
+    max-width: 260px;
+    aspect-ratio: 1 / 1;
+  }
+  @supports not (aspect-ratio: 1 / 1){
+    .tv3-figure{ padding-top: 100%; height: 0; }
+  }
+}
+/* --- Footer Layout: Desktop = eine Zeile; Mobile = 3 Zeilen --- */
+.site-footer { padding: 20px 0; }
+
+.footer-wrap{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: nowrap;
+}
+
+/* Links-Gruppen */
+.footer-links.primary,
+.footer-legal{
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Pipes zwischen Section-Links */
+.footer-links.primary a + a::before{
+  content: "|";
+  margin: 0 .6rem;
+  opacity: .6;
+}
+
+/* Kleiner Abstand zwischen Sections und Legal-Gruppe */
+.footer-legal{ margin-left: 1rem; }
+
+/* Pipe zwischen Impressum & Datenschutz */
+.footer-legal a + a::before{
+  content: "|";
+  margin: 0 .6rem;
+  opacity: .6;
+}
+
+/* Brand rechts */
+.footer-brand{
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+.footer-logo.is-hidden{ display:none; }
+.footer-brand.no-logo{ gap:.25rem; }
+
+/* --- Mobile: 3 Zeilen (Sections / Legal / Brand) --- */
+@media (max-width: 700px){
+  .footer-wrap{
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+  }
+  .footer-links.primary{ order: 1; justify-content: center; }
+  .footer-legal{ order: 2; margin-left: 0; justify-content: center; }
+  .footer-brand{ order: 3; justify-content: center; }
+}
