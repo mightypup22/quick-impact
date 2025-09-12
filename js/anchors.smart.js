@@ -1,0 +1,1 @@
+// anchors.smart.js placeholder
