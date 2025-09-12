@@ -328,3 +328,24 @@ initHeader();
   }catch(e){ console.error('TeamSlider Modul konnte nicht geladen werden', e); }
   fixSectionLinks(); initFlowLine(); initSmartHeader(); initTeamSlider(); window.addEventListener('resize', initFlowLine, {passive:true});
 });
+
+// ensure logo svg on all viewports
+(function forceSvgLogo(){
+  function apply(){
+    var nodes = [
+      document.querySelector('#site-logo'),
+      document.querySelector('#footer-logo'),
+      document.querySelector('.brand img'),
+      document.querySelector('.footer-logo')
+    ].filter(Boolean);
+    nodes.forEach(function(img){
+      if (img.getAttribute('srcset')) img.removeAttribute('srcset');
+      if (img.getAttribute('sizes')) img.removeAttribute('sizes');
+      var cur = img.getAttribute('src')||'';
+      if (!/assets\/logo\.svg$/i.test(cur)) img.setAttribute('src','assets/logo.svg');
+    });
+  }
+  document.addEventListener('DOMContentLoaded', apply);
+  window.addEventListener('load', apply);
+  window.addEventListener('resize', apply);
+})();
