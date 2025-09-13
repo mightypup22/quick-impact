@@ -1,72 +1,103 @@
-/* safe-guard */
-(function(){ if(!document.querySelector('.team-slider')) return; })();
+// js/components/teamSlider.js — robust drop‑in
+// Idempotent, DOM‑safe, creates dots if missing, auto‑slide, swipe, auto‑height.
 
-/* v7 guard */
-(function(){
-  var root = document.querySelector('.team-slider, [data-team-slider], #team-slider, #teamCarousel, #team, #team-slider-root');
-  if(!root){ return; }
-  try {
-    // original code continues...
-  } catch(e){ console.warn('TeamSlider runtime guard:', e); }
-})();
-// components/teamSlider.js (dots only, auto-slide, auto-height, swipe)
+let __tsInitialized = false;
+let __tsTimer = null;
+
 export function initTeamSlider(){
-  const root = document.getElementById('teamv3');
-  if(!root) return;
-  const viewport = root.querySelector('.tv3-viewport');
-  const slides = Array.from(viewport.querySelectorAll('.tv3-slide'));
-  const dotsWrap = root.querySelector('.tv3-dots');
+  if (__tsInitialized) return;
 
-  // Build dots
-  dotsWrap.innerHTML = '';
-  slides.forEach((_,i)=>{
-    const b=document.createElement('button');
-    b.setAttribute('aria-label','Folie '+(i+1));
-    b.addEventListener('click',()=>{ goto(i); restart(); });
-    dotsWrap.appendChild(b);
-  });
+  // Accept multiple root selectors for robustness
+  const root = document.querySelector('#teamv3, .team-slider, [data-team-slider], #team, #teamCarousel, #team-slider-root');
+  if (!root) return;
 
-  let index=0, timer=null, running=true;
+  // Viewport detection (fallbacks allowed)
+  const viewport = root.querySelector('.tv3-viewport, .team-viewport, .slider-viewport');
+  if (!viewport) return;
 
-  function setActive(i){
-    slides.forEach((s,si)=>s.classList.toggle('active', si===i));
-    Array.from(dotsWrap.children).forEach((d,di)=>d.classList.toggle('active', di===i));
-    updateHeight();
+  const slides = Array.from(viewport.querySelectorAll('.tv3-slide, .team-slide, .slide'));
+  if (!slides.length) return;
+
+  // Ensure dots container
+  let dotsWrap = root.querySelector('.tv3-dots, .team-dots, .slider-dots');
+  if (!dotsWrap) {
+    dotsWrap = document.createElement('div');
+    dotsWrap.className = 'tv3-dots';
+    // Place after viewport if possible
+    if (viewport.parentNode) {
+      viewport.parentNode.insertBefore(dotsWrap, viewport.nextSibling);
+    } else {
+      root.appendChild(dotsWrap);
+    }
+  } else {
+    // Clear previous if any
+    dotsWrap.innerHTML = '';
   }
 
-  function goto(i){ index=(i+slides.length)%slides.length; setActive(index); }
-  function next(){ goto(index+1); }
+  // Build dots
+  slides.forEach((_, i) => {
+    const b = document.createElement('button');
+    b.className = 'dot';
+    b.type = 'button';
+    b.setAttribute('aria-label', 'Folie ' + (i + 1));
+    b.addEventListener('click', () => { goto(i); restart(); });
+    dotsWrap.appendChild(b);
+  });
+  const dotEls = Array.from(dotsWrap.querySelectorAll('.dot'));
 
-  function start(){ if(timer) return; timer=setInterval(()=>{ if(running) next(); }, 6500); }
-  function stop(){ if(timer){ clearInterval(timer); timer=null; } }
+  let index = 0;
+  let running = true;
+
+  function setActive(i){
+    slides.forEach((s, si) => s.classList.toggle('active', si === i));
+    dotEls.forEach((d, di) => d.classList.toggle('active', di === i));
+    updateHeight();
+  }
+  function goto(i){ index = (i + slides.length) % slides.length; setActive(index); }
+  function next(){ goto(index + 1); }
+
+  function start(){ if (__tsTimer) return; __tsTimer = setInterval(() => { if (running) next(); }, 6500); }
+  function stop(){ if (__tsTimer){ clearInterval(__tsTimer); __tsTimer = null; } }
   function restart(){ stop(); start(); }
 
   // Pause on hover/focus
-  root.addEventListener('pointerenter',()=>{ running=false; });
-  root.addEventListener('pointerleave',()=>{ running=true; });
-  root.addEventListener('focusin',()=>{ running=false; });
-  root.addEventListener('focusout',()=>{ running=true; });
+  root.addEventListener('pointerenter', () => { running = false; });
+  root.addEventListener('pointerleave', () => { running = true; });
+  root.addEventListener('focusin',       () => { running = false; });
+  root.addEventListener('focusout',      () => { running = true; });
 
   // Only run when visible
-  const io=new IntersectionObserver((ents)=>{ ents.forEach(en=>{ running=en.isIntersecting; }); }, {threshold:.15});
-  io.observe(root);
+  try {
+    const io = new IntersectionObserver((ents) => {
+      ents.forEach(en => { running = en.isIntersecting; });
+    }, { threshold: .15 });
+    io.observe(root);
+  } catch(e){ /* older browsers */ }
 
-  // Swipe support
-  let sx=0, dx=0, swiping=false;
-  viewport.addEventListener('pointerdown',(e)=>{ swiping=true; sx=e.clientX; viewport.setPointerCapture(e.pointerId); });
-  viewport.addEventListener('pointerup',()=>{ if(!swiping) return; swiping=false; if(Math.abs(dx)>44){ if(dx<0) next(); else goto(index-1); restart(); } dx=0; });
-  viewport.addEventListener('pointermove',(e)=>{ if(!swiping) return; dx=e.clientX-sx; });
+  // Swipe support (pointer events)
+  let sx = 0, dx = 0, swiping = false;
+  viewport.addEventListener('pointerdown', (e) => {
+    swiping = true; sx = e.clientX;
+    try { viewport.setPointerCapture(e.pointerId); } catch(_){}
+  });
+  viewport.addEventListener('pointerup', () => {
+    if (!swiping) return;
+    swiping = false;
+    if (Math.abs(dx) > 44){ if (dx < 0) next(); else goto(index - 1); restart(); }
+    dx = 0;
+  });
+  viewport.addEventListener('pointermove', (e) => { if (swiping) dx = e.clientX - sx; });
 
   // Auto-height from active slide
   function updateHeight(){
     const active = slides[index];
-    if(!active) return;
-    const h = Math.max( active.scrollHeight, 280 );
+    if (!active) return;
+    const h = Math.max(active.scrollHeight, active.offsetHeight || 0, 280);
     viewport.style.height = h + 'px';
   }
-  slides.forEach(sl=>{
-    sl.querySelectorAll('img').forEach(img=>{
-      img.addEventListener('load', updateHeight, {once:false});
+  slides.forEach(sl => {
+    sl.querySelectorAll('img').forEach(img => {
+      img.addEventListener('load', updateHeight, { once: false });
     });
   });
   window.addEventListener('resize', updateHeight);
@@ -74,5 +105,14 @@ export function initTeamSlider(){
   // Init
   setActive(index);
   start();
-  setTimeout(updateHeight, 100);
+  requestAnimationFrame(updateHeight);
+  setTimeout(updateHeight, 120);
+
+  __tsInitialized = true;
+}
+
+// Legacy global API (in case main.js calls Module/TeamSlider)
+if (typeof window !== 'undefined') {
+  window.TeamSlider = window.TeamSlider || {};
+  window.TeamSlider.initTeamSlider = initTeamSlider;
 }
