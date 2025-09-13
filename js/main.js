@@ -1,3 +1,54 @@
+/* prelude v8 */
+(function(){
+  function fixLogo(){
+    var sels=['#site-logo','#footer-logo','.brand img.logo','.brand img','.footer-logo','img.logo'];
+    for (var i=0;i<sels.length;i++){
+      var nodes = document.querySelectorAll(sels[i]);
+      for (var j=0;j<nodes.length;j++){
+        var img = nodes[j];
+        if(!img) continue;
+        img.removeAttribute('srcset'); img.removeAttribute('sizes');
+        var want = '/assets/logo.svg';
+        var cur = img.getAttribute('src')||'';
+        if(cur !== want){ img.setAttribute('src', want); }
+      }
+    }
+  }
+  document.addEventListener('DOMContentLoaded', fixLogo);
+  window.addEventListener('load', fixLogo);
+  window.addEventListener('resize', fixLogo);
+  try{ new MutationObserver(fixLogo).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['src','srcset','sizes']}); }catch(e){}
+
+  function hasCont(){
+    return document.querySelector('.team-slider, [data-team-slider], #team-slider, #teamCarousel, #team, #team-slider-root');
+  }
+  function wrap(mod){
+    if(!mod) mod = {};
+    var orig = mod.initTeamSlider;
+    mod.initTeamSlider = function(){
+      if(!hasCont()){ console.warn('TeamSlider: container missing, call blocked'); return; }
+      try { return (orig||function(){}).apply(this, arguments); } catch(e){ console.warn('TeamSlider error:', e); }
+    };
+    return mod;
+  }
+  try { var _ts = window.TeamSlider; Object.defineProperty(window,'TeamSlider',{configurable:true,get:()=>_ts,set:v=>{_ts=wrap(v);}}); if(_ts) window.TeamSlider=_ts; } catch(e){}
+  try { var _md = window.Module; Object.defineProperty(window,'Module',{configurable:true,get:()=>_md,set:v=>{_md=wrap(v);}}); if(_md) window.Module=_md; } catch(e){}
+
+  var origFetch = window.fetch;
+  if(origFetch){
+    var BID = (window.__BUILD_ID__ = window.__BUILD_ID__ || String(Date.now()));
+    window.fetch = function(input, init){
+      try{
+        var url = (typeof input==='string')?input:(input&&input.url)||'';
+        if(/^components\//i.test(url)){
+          url += (url.includes('?')?'&':'?') + 'v=' + encodeURIComponent(BID);
+          input = (typeof input==='string')?url:new Request(url, init);
+        }
+      }catch(e){}
+      return origFetch.call(this, input, init);
+    };
+  }
+})();
 window.__BUILD_ID__="2025-09-12T20:33:09Z";function bust(u){const s=u.includes('?')?'&':'?';return u+s+'v='+encodeURIComponent(window.__BUILD_ID__)};
 // main.js (ES module)
 const CONFIG={

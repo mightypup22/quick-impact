@@ -663,3 +663,32 @@ html,body{ overflow-x:hidden; }
 @media (max-width:760px){
   .brand img, .footer-logo { content: normal !important; background: none !important; background-image: none !important; }
 }
+
+
+/* v8 logo clamp */
+.brand img.logo, .brand .logo, img.logo, .footer-logo {
+  background: none !important;
+  background-image: none !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  content: normal !important;
+  image-rendering: auto !important;
+}
+.brand, .footer-brand, header .brand, footer .footer-brand { background: none !important; background-image: none !important; }
+.brand img.logo { width: clamp(120px, 18vw, 180px); height: auto; display: inline-block; }
+footer .footer-logo { width: clamp(110px, 16vw, 160px); height: auto; display: inline-block; }
+
+@supports (-webkit-touch-callout: none) {
+  .brand img.logo, .footer-logo {
+    background: none !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+    content: normal !important;
+  }
+}
+
+/* Optional: switch to a very simple mobile SVG logo (disabled)
+@media (max-width: 480px){
+  .brand img.logo { content: url('/assets/logo-mobile.svg'); }
+}
+*/

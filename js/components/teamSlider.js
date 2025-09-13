@@ -1,3 +1,5 @@
+/* v8 guard */
+(function(){ if(!document.querySelector('.team-slider, [data-team-slider], #team-slider, #teamCarousel, #team, #team-slider-root')) return; })();
 // components/teamSlider.js (dots only, auto-slide, auto-height, swipe)
 export function initTeamSlider(){
   const root = document.getElementById('teamv3');
