@@ -1,6 +1,8 @@
-// js/contact-handler.js — v5 (global capture, no-redirect, consent required)
+// js/contact-handler.js — v6 (global capture, no-redirect, consent must be checked)
 (function(){
-  if (window.__contactHandlerV5) return; window.__contactHandlerV5 = true;
+  if (window.__contactHandlerV6) return; window.__contactHandlerV6 = true;
+
+  const MATCH = 'form#contact-form, form#contactForm, form.contact-formv3';
 
   function ensureStatusBox(form){
     let box = form.querySelector('#cf3-status, .cf3-status');
@@ -21,7 +23,6 @@
     try{ box.scrollIntoView({behavior:'smooth', block:'nearest'}); }catch(_){}
   }
 
-  const MATCH = 'form#contact-form, form#contactForm, form.contact-formv3';
   function primeForm(form){
     if (!form || form.__contactPrimed) return;
     form.__contactPrimed = true;
@@ -41,40 +42,57 @@
     const form = e.target && e.target.closest && e.target.closest(MATCH);
     if (!form) return;
 
+    // Hard stop: never navigate
     e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation();
 
     const q = (sel) => form.querySelector(sel);
-    const name    = q('#name, #cf-name');
-    const email   = q('#email, #cf-email');
-    const message = q('#message, #cf-message');
-    const consent = q('#consent, #cf-consent');
-    const submit  = form.querySelector('button[type="submit"], input[type="submit"]');
+    const nameEl    = q('#name, #cf-name, input[name="name"]');
+    const emailEl   = q('#email, #cf-email, input[name="email"]');
+    const messageEl = q('#message, #cf-message, textarea[name="message"], textarea[name="anliegen"]');
+    const consentEl = q('#consent, #cf-consent, input[name="consent"]');
+    const submitEl  = form.querySelector('button[type="submit"], input[type="submit"]');
 
     const payload = {
-      name: (name && name.value || '').trim(),
-      email: (email && email.value || '').trim(),
-      message: (message && message.value || '').trim(),
-      consent: !!(consent && (consent.checked || consent.value === 'on')),
-      website: '' // honeypot empty
+      name: (nameEl && nameEl.value || '').trim(),
+      email: (emailEl && emailEl.value || '').trim(),
+      message: (messageEl && messageEl.value || '').trim(),
+      // IMPORTANT: only treat as true when actually checked
+      consent: !!(consentEl && consentEl.checked),
+      website: '' // honeypot intentionally empty client-side
     };
 
-    // Client-side validation incl. consent
+    // reset visual error state
+    const consentField = consentEl ? (consentEl.closest('.field') || consentEl.parentElement) : null;
+    if (consentField) consentField.classList.remove('invalid');
+
+    // basic validation
     if (!payload.name || !payload.email || !payload.message){
       show(form, 'Bitte Name, E‑Mail und Anliegen ausfüllen.', true);
       return;
     }
     if (!payload.consent){
+      if (consentField) consentField.classList.add('invalid');
       show(form, 'Bitte Einwilligung bestätigen.', true);
-      try{ consent && consent.focus(); }catch(_){}
+      try{ consentEl && consentEl.focus(); }catch(_){}
+      // listen once to clear the error state
+      try{
+        consentEl && consentEl.addEventListener('change', () => {
+          consentField && consentField.classList.remove('invalid');
+        }, { once: true });
+      }catch(_){}
       return;
     }
 
-    const revert = submit && (() => {
-      const isBtn = submit.tagName === 'BUTTON';
-      const lbl   = isBtn ? submit.textContent : submit.value;
-      submit.disabled = true;
-      if (isBtn) submit.textContent = 'Senden …'; else submit.value = 'Senden …';
-      return () => { submit.disabled = false; if (isBtn) submit.textContent = lbl; else submit.value = lbl; };
+    // UI busy state
+    const revert = submitEl && (() => {
+      const isBtn = submitEl.tagName === 'BUTTON';
+      const label = isBtn ? submitEl.textContent : submitEl.value;
+      submitEl.disabled = true;
+      if (isBtn) submitEl.textContent = 'Senden …'; else submitEl.value = 'Senden …';
+      return () => {
+        submitEl.disabled = false;
+        if (isBtn) submitEl.textContent = label; else submitEl.value = label;
+      };
     })();
 
     fetch('/api/contact', {
@@ -87,27 +105,14 @@
       let data = {}; try { data = await resp.json(); } catch(_){}
       if (!resp.ok || !data?.ok) throw new Error(data?.error || 'Senden fehlgeschlagen.');
       form.reset();
+      if (consentField) consentField.classList.remove('invalid');
       show(form, 'Vielen Dank! Ihre Nachricht wurde gesendet. Wir melden uns zeitnah.', false);
     })
     .catch((err) => {
-      console.error('[contact-handler v5] send error', err);
+      console.error('[contact-handler v6] send error', err);
       show(form, 'Leider konnte die Nachricht nicht gesendet werden. Bitte versuchen Sie es später erneut.', true);
     })
     .finally(() => { if (revert) revert(); });
   }, { capture: true, passive: false });
 
-  document.addEventListener('DOMContentLoaded', () => {
-    try {
-      const u = new URL(window.location.href);
-      const f = document.querySelector(MATCH);
-      if (!f) return;
-      if (u.searchParams.get('sent') === '1') {
-        show(f, 'Vielen Dank! Ihre Nachricht wurde gesendet. Wir melden uns zeitnah.', false);
-        u.searchParams.delete('sent'); history.replaceState({}, '', u.pathname + u.hash);
-      } else if (u.searchParams.get('error') === '1') {
-        show(f, 'Leider ist etwas schiefgelaufen. Bitte versuchen Sie es später erneut.', true);
-        u.searchParams.delete('error'); history.replaceState({}, '', u.pathname + u.hash);
-      }
-    } catch(_){}
-  });
 })();

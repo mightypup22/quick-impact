@@ -729,3 +729,17 @@ footer .footer-logo.logo {
 .cf3-status.error{
   background:rgba(220,38,38,.10); color:#ffffff; border-color:rgba(220,38,38,.35);
 }
+/* Consent-Checkbox Styling & Error-Zustand */
+.field.consent input[type="checkbox"]{
+  accent-color: #10b981; /* smaragdgrün passend zum Theme */
+}
+
+.field.consent.invalid{
+  outline: 2px solid rgba(220,38,38,.45);
+  outline-offset: 6px;
+  border-radius: 10px;
+  transition: outline-color .2s ease;
+}
+.field.consent.invalid label{
+  color: #7f1d1d;
+}
