@@ -1,3 +1,12 @@
+
+/* v7 guard */
+(function(){
+  var root = document.querySelector('.team-slider, [data-team-slider], #team-slider, #teamCarousel, #team, #team-slider-root');
+  if(!root){ return; }
+  try {
+    // original code continues...
+  } catch(e){ console.warn('TeamSlider runtime guard:', e); }
+})();
 // components/teamSlider.js (dots only, auto-slide, auto-height, swipe)
 export function initTeamSlider(){
   const root = document.getElementById('teamv3');

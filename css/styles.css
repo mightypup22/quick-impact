@@ -657,3 +657,23 @@ html,body{ overflow-x:hidden; }
   .footer-legal{ order: 2; margin-left: 0; justify-content: center; }
   .footer-brand{ order: 3; justify-content: center; }
 }
+
+
+/* v7 logo clamp */
+.brand, .footer-brand { background: none !important; }
+.brand img, .footer-logo, img.logo {
+  background: none !important;
+  background-image: none !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  content: normal !important;
+}
+@media (max-width: 760px){
+  .brand img, .footer-logo, img.logo {
+    background: none !important;
+    background-image: none !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+    content: normal !important;
+  }
+}

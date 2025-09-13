@@ -1,16 +1,21 @@
 {
-  "name": "QuickImpact Programming",
-  "short_name": "QW Programming",
+  "name": "Quick Impact Programming",
+  "short_name": "Quick Impact",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0a0f0e",
-  "theme_color": "#10b981",
+  "background_color": "#0f2f29",
+  "theme_color": "#0f2f29",
   "icons": [
     {
-      "src": "/assets/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
+      "src": "/assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
-  ],
-  "lang": "de"
+  ]
 }

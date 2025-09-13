@@ -1,3 +1,63 @@
+/* prelude v7 */
+(function(){
+  function fixLogo(){
+    ['#site-logo','#footer-logo','.brand img','.footer-logo','img.logo'].forEach(function(sel){
+      document.querySelectorAll(sel).forEach(function(img){
+        if(!img) return;
+        img.removeAttribute('srcset'); img.removeAttribute('sizes');
+        var cur = img.getAttribute('src')||'';
+        if(cur !== '/assets/logo.svg') img.setAttribute('src','/assets/logo.svg');
+      });
+    });
+  }
+  document.addEventListener('DOMContentLoaded', fixLogo);
+  window.addEventListener('load', fixLogo);
+  window.addEventListener('resize', fixLogo);
+  new MutationObserver(fixLogo).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['src','srcset','sizes']});
+
+  // Cache-bust components
+  var origFetch = window.fetch;
+  if (origFetch){
+    var BID = (window.__BUILD_ID__ = window.__BUILD_ID__ || String(Date.now()));
+    window.fetch = function(input, init){
+      try{
+        var url = (typeof input==='string')?input:(input&&input.url)||'';
+        if(/^components\//i.test(url)){
+          url += (url.includes('?')?'&':'?') + 'v=' + encodeURIComponent(BID);
+          input = (typeof input==='string')?url:new Request(url, init);
+        }
+      }catch(e){}
+      return origFetch.call(this, input, init);
+    };
+  }
+
+  // Guard TeamSlider init regardless of call order
+  function hasContainer(){
+    return document.querySelector('.team-slider, [data-team-slider], #team-slider, #teamCarousel, #team, #team-slider-root');
+  }
+  function wrap(mod){
+    if(!mod) mod = {};
+    var orig = mod.initTeamSlider;
+    mod.initTeamSlider = function(){
+      if(!hasContainer()){ console.warn('TeamSlider: no container, skip'); return; }
+      try { return (orig||function(){}).apply(this, arguments); }
+      catch(e){ console.warn('TeamSlider error:', e); }
+    };
+    return mod;
+  }
+  try {
+    var _ts = window.TeamSlider;
+    Object.defineProperty(window, 'TeamSlider', {configurable:true,
+      get: function(){ return _ts; }, set: function(v){ _ts = wrap(v); }});
+    if (_ts) window.TeamSlider = _ts;
+  } catch(e){}
+  try {
+    var _md = window.Module;
+    Object.defineProperty(window, 'Module', {configurable:true,
+      get: function(){ return _md; }, set: function(v){ _md = wrap(v); }});
+    if (_md) window.Module = _md;
+  } catch(e){}
+})();
 // main.js (ES module)
 const CONFIG={
   brandName:'QuickImpact Programming',
