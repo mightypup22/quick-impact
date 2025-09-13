@@ -1,6 +1,6 @@
 // main.js (ES module)
 const CONFIG={
-  brandName:'QuickImpact Programming',
+  brandName:'Quick Impact Programming',
   contactEmail:'hello@quickwin-solutions.example',
   phone:'+49 000 000000',
   address:'Musterstraße 1, 12345 Musterstadt'

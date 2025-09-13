@@ -60,7 +60,7 @@
 })();
 // main.js (ES module)
 const CONFIG={
-  brandName:'QuickImpact Programming',
+  brandName:'Quick Impact Programming',
   contactEmail:'hello@quickwin-solutions.example',
   phone:'+49 000 000000',
   address:'Musterstraße 1, 12345 Musterstadt'
@@ -388,3 +388,4 @@ initHeader();
   }catch(e){ console.error('TeamSlider Modul konnte nicht geladen werden', e); }
   fixSectionLinks(); initFlowLine(); initSmartHeader(); initTeamSlider(); window.addEventListener('resize', initFlowLine, {passive:true});
 });
+if('serviceWorker'in navigator){navigator.serviceWorker.getRegistrations().then(r=>r.forEach(x=>x.unregister())).catch(()=>{});}
