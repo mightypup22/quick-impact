@@ -4,24 +4,20 @@
 <svg
    version="1.1"
    id="svg1"
-   width="628.90625"
-   height="583.20312"
-   viewBox="0 0 628.90625 583.20312"
+   width="733.72369"
+   height="680.40338"
+   viewBox="0 0 733.72369 680.40338"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <defs
      id="defs1" />
   <g
      id="g1"
-     transform="translate(-131.2666,-250.86987)">
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:800px;font-family:Bahnschrift;-inkscape-font-specification:'Bahnschrift Semi-Bold';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#10b981;fill-opacity:1"
-       x="76.579102"
-       y="824.698"
-       id="text12"><tspan
-         id="tspan12"
-         x="76.579102"
-         y="824.698">QI</tspan></text>
+     transform="translate(-140.38116,-155.23209)">
+    <path
+       d="M 618.89662,835.63549 367.33421,641.03921 424.75606,568.12257 676.31848,762.26312 Z m -241.08064,-4.10156 q -71.54946,0 -125.32548,-30.07811 -53.3203,-30.53384 -82.94268,-85.67705 -29.16666,-55.14321 -29.16666,-128.51558 V 399.50283 q 0,-73.8281 29.16666,-128.51558 29.62238,-55.14321 82.94268,-85.22132 53.77602,-30.53384 125.32548,-30.53384 71.54945,0 124.86974,30.53384 53.77603,30.07811 82.94268,85.22132 29.62239,54.68748 29.62239,128.51558 v 187.76036 q 0,73.37237 -29.62239,128.51558 -29.16665,55.14321 -82.94268,85.67705 -53.32029,30.07811 -124.86974,30.07811 z m 0,-108.00777 q 56.96612,0 91.1458,-36.45832 34.17967,-36.45832 34.17967,-96.61455 V 396.31273 q 0,-60.15623 -34.17967,-96.61455 -34.17968,-36.45832 -91.1458,-36.45832 -56.5104,0 -91.14581,36.45832 -34.17967,36.45832 -34.17967,96.61455 v 194.14056 q 0,60.15623 34.17967,96.61455 34.63541,36.45832 91.14581,36.45832 z M 874.10488,162.06802 V 824.698 H 762.907 V 162.06802 Z"
+       id="text12"
+       style="font-weight:600;font-size:933.333px;font-family:Bahnschrift;-inkscape-font-specification:'Bahnschrift Semi-Bold';fill:#10b981"
+       aria-label="QI" />
   </g>
 </svg>
