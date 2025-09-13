@@ -724,8 +724,8 @@ footer .footer-logo.logo {
 .cf3-status[hidden]{ display:none !important; }
 .cf3-status{
   margin-top:12px; padding:12px 14px; border-radius:10px; font-size:.95rem;
-  background:rgba(16,185,129,.12); color:#0b3b2f; border:1px solid rgba(16,185,129,.35);
+  background:rgba(16,185,129,.12); color:#ffffff; border:1px solid rgba(16,185,129,.35);
 }
 .cf3-status.error{
-  background:rgba(220,38,38,.10); color:#7f1d1d; border-color:rgba(220,38,38,.35);
+  background:rgba(220,38,38,.10); color:#ffffff; border-color:rgba(220,38,38,.35);
 }
