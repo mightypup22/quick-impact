@@ -1,34 +1,131 @@
-const { Resend } = require('resend');
+// /api/contact.js — Vercel Serverless Function (Node 18+)
+// Uses RESEND REST API directly (no SDK dependency).
+// Env vars (Vercel → Project → Settings → Environment Variables):
+// - RESEND_API_KEY     (required)
+// - MAIL_FROM          (recommended, e.g. "Quick Impact <kontakt@quick-impact.de>" or "onboarding@resend.dev" for testing)
+// - MAIL_TO            (required, your inbox address)
+// - ALLOWED_ORIGINS    (optional, comma-separated; e.g. "https://quick-impact.de,https://www.quick-impact.de,https://quick-impact.vercel.app")
+
+function json(res, status, data){
+  res.statusCode = status;
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.end(JSON.stringify(data));
+}
+
+function allowOrigin(req, res){
+  const origin = req.headers.origin || '';
+  const allowed = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map(s=>s.trim()).filter(Boolean)
+    : [];
+  if (allowed.length && allowed.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
 
 module.exports = async (req, res) => {
-  if (req.method !== 'POST') return res.status(405).json({ ok:false, error:'Method Not Allowed' });
-  try{
-    let data = {};
-    const ct = (req.headers['content-type'] || '').toLowerCase();
-    if (ct.includes('application/json')) {
-      data = req.body || {};
-    } else {
-      const chunks = [];
-      for await (const ch of req) chunks.push(ch);
-      const body = Buffer.concat(chunks).toString('utf8');
-      data = Object.fromEntries(new URLSearchParams(body));
-    }
-    const { name, email, message, consent, website } = data;
-    if (website) return res.status(200).json({ ok:true, spam:true });
-    if (!name || !email || !message || !consent) {
-      return res.status(400).json({ ok:false, error:'Bitte alle Felder ausfüllen und Einverständnis erteilen.' });
-    }
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    await resend.emails.send({
-      from: process.env.CONTACT_FROM,
-      to: process.env.CONTACT_TO,
-      reply_to: email,
-      subject: `Neue Anfrage – Quick Impact (${name})`,
-      text: `Name: ${name}\nE-Mail: ${email}\n\nAnliegen:\n${message}`
-    });
-    return res.status(200).json({ ok:true });
-  } catch (e) {
-    console.error(e);
-    return res.status(500).json({ ok:false, error:'Serverfehler beim Versand.' });
+  allowOrigin(req, res);
+
+  if (req.method === 'OPTIONS') {
+    res.statusCode = 204;
+    return res.end();
   }
-};
+
+  if (req.method !== 'POST') {
+    return json(res, 405, { ok:false, error:'Method not allowed' });
+  }
+
+  try{
+    const chunks = [];
+    for await (const c of req) chunks.push(c);
+    const raw = Buffer.concat(chunks).toString('utf8') || '{}';
+    let body;
+    try{ body = JSON.parse(raw); }catch(_){ body = {}; }
+
+    const name    = (body.name||'').toString().trim();
+    const email   = (body.email||'').toString().trim();
+    const message = (body.message||body.anliegen||'').toString().trim();
+    const consent = Boolean(body.consent);
+    const hp      = (body.website||'').toString().trim(); // honeypot
+
+    // Basic validation
+    if (hp) return json(res, 200, { ok:true, message:'Thanks.' }); // bot
+    if (!name || !email || !message) return json(res, 400, { ok:false, error:'Bitte Name, E‑Mail und Anliegen ausfüllen.' });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json(res, 400, { ok:false, error:'Bitte eine gültige E‑Mail angeben.' });
+    if (!consent) return json(res, 400, { ok:false, error:'Bitte Einwilligung bestätigen.' });
+
+    const RESEND_API_KEY = process.env.RESEND_API_KEY;
+    if (!RESEND_API_KEY) return json(res, 500, { ok:false, error:'Server: RESEND_API_KEY fehlt.' });
+
+    const MAIL_TO   = process.env.MAIL_TO || '';
+    const MAIL_FROM = process.env.MAIL_FROM || 'onboarding@resend.dev';
+    if (!MAIL_TO) return json(res, 500, { ok:false, error:'Server: MAIL_TO ist nicht gesetzt.' });
+
+    const ua = req.headers['user-agent'] || '';
+    const ip = (req.headers['x-forwarded-for'] || '').split(',')[0] || req.socket?.remoteAddress || '';
+
+    const subject = `Neue Kontaktanfrage · Quick Impact (${name})`;
+    const html = `
+      <style>
+      .box{font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;line-height:1.5;color:#0f172a}
+      .muted{color:#475569;font-size:12px}
+      .row{margin:6px 0}
+      strong{color:#0b3b2f}
+      </style>
+      <div class="box">
+        <h2>${subject}</h2>
+        <div class="row"><strong>Name:</strong> ${escapeHtml(name)}</div>
+        <div class="row"><strong>E‑Mail:</strong> ${escapeHtml(email)}</div>
+        <div class="row"><strong>Einverständnis:</strong> ${consent?'ja':'nein'}</div>
+        <div class="row"><strong>Nachricht:</strong><br>${escapeHtml(message).replace(/\n/g,'<br>')}</div>
+        <hr>
+        <div class="muted">IP: ${escapeHtml(ip)} · UA: ${escapeHtml(ua)}</div>
+      </div>
+    `;
+    const text = `Neue Kontaktanfrage
+Name: ${name}
+E-Mail: ${email}
+Einverständnis: ${consent?'ja':'nein'}
+
+Nachricht:
+${message}
+
+IP: ${ip}
+UA: ${ua}
+`;
+
+    const resp = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: MAIL_FROM,
+        to: [MAIL_TO],
+        reply_to: [email],
+        subject,
+        html,
+        text
+      })
+    });
+
+    const data = await resp.json();
+    if (!resp.ok) {
+      console.error('Resend error:', data);
+      return json(res, 502, { ok:false, error:'Email-Versand fehlgeschlagen.', detail:data });
+    }
+
+    return json(res, 200, { ok:true, id:data?.id || null });
+  }catch(err){
+    console.error(err);
+    return json(res, 500, { ok:false, error:'Unerwarteter Serverfehler.' });
+  }
+}
+
+// Tiny HTML escape
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, (ch)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch]));
+}
