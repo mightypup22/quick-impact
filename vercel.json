@@ -7,3 +7,11 @@
     {"source": "/assets/(og|icons)/(.*)", "headers": [{"key": "Cache-Control", "value": "public, max-age=86400"}]}
   ]
 }
+// vercel.json (im Repo-Root)
+{
+  "functions": {
+    "api/contact.js": {
+      "runtime": "nodejs18.x"
+    }
+  }
+}
