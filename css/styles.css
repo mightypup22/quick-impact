@@ -657,3 +657,67 @@ html,body{ overflow-x:hidden; }
   .footer-legal{ order: 2; margin-left: 0; justify-content: center; }
   .footer-brand{ order: 3; justify-content: center; }
 }
+
+
+/* v7 logo clamp */
+.brand, .footer-brand { background: none !important; }
+.brand img, .footer-logo, img.logo {
+  background: none !important;
+  background-image: none !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  content: normal !important;
+}
+@media (max-width: 760px){
+  .brand img, .footer-logo, img.logo {
+    background: none !important;
+    background-image: none !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+    content: normal !important;
+  }
+}
+
+
+/* === Logo sizing reset (compact) === */
+:root{
+  --logo-h-desktop: 28px;
+  --logo-h-mobile: 20px;
+}
+.brand img.logo,
+img.logo#site-logo,
+footer .footer-logo.logo {
+  height: var(--logo-h-desktop) !important;
+  width: auto !important;
+  max-height: var(--logo-h-desktop) !important;
+  object-fit: contain !important;
+  background: none !important;
+  background-image: none !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  content: normal !important;
+  image-rendering: auto !important;
+}
+@media (max-width: 768px){
+  .brand img.logo,
+  img.logo#site-logo,
+  footer .footer-logo.logo {
+    height: var(--logo-h-mobile) !important;
+    max-height: var(--logo-h-mobile) !important;
+  }
+}
+@supports (-webkit-touch-callout: none) {
+  .brand img.logo,
+  footer .footer-logo.logo {
+    background: none !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+    content: normal !important;
+  }
+}
+
+/* Optional: Logo auf sehr kleinen Bildschirmen ausblenden (falls nötig)
+@media (max-width: 420px){
+  .brand img.logo { display: none !important; }
+}
+*/
