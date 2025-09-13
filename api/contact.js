@@ -145,3 +145,22 @@ UA: ${ua}
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, ch => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":'&#39;' }[ch]));
 }
+// … nach erfolgreichem Resend-Call:
+const wantsHtml = (req.headers.accept || '').includes('text/html');
+const isJsonPost = (req.headers['content-type'] || '').includes('application/json');
+
+// Wenn kein AJAX/JSON-Post: per Redirect zurück zur Seite
+if (wantsHtml && !isJsonPost) {
+  res.statusCode = 303;
+  res.setHeader('Location', '/?sent=1#kontakt');
+  return res.end();
+}
+return json(res, 200, { ok:true, id: data?.id || null });
+
+// z. B. bei Validierungsfehler:
+if (wantsHtml && !isJsonPost) {
+  res.statusCode = 303;
+  res.setHeader('Location', '/?error=1#kontakt');
+  return res.end();
+}
+return json(res, 400, { ok:false, error:'Bitte Name, E-Mail und Anliegen ausfüllen.' });
