@@ -36,48 +36,64 @@
   <script type="module" src="js/main.js" defer></script>
   <script src="js/anchors.smart.js" defer></script>
   <script src="js/contact-handler.js?v=6" defer></script>
+  <!-- ProfessionalService -->
   <script type="application/ld+json">
   {
-    "@context": "https://schema.org",
-    "@type": "ProfessionalService",
-    "name": "Quick Impact Programming",
-    "url": "https://www.quick-impact.de/",
-    "logo": "https://www.quick-impact.de/assets/logo-mark.svg",
-    "image": "https://www.quick-impact.de/assets/og-cover.png",
-    "description": "Maßgeschneiderte Excel/Access-Automationen, Dashboards und Web-/Mobile-Apps für KMU mit Festpreisen und KVP.",
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "Berlin",
-      "addressCountry": "DE"
-    },
-    "areaServed": "DE",
-    "sameAs": [
-      "https://www.linkedin.com/company/quick-impact",
-      "https://github.com/quick-impact",
-    ] 
+    "@context":"https://schema.org",
+    "@type":"ProfessionalService",
+    "name":"Quick Impact Programming",
+    "url":"https://quick-impact.de/",
+    "logo":"https://quick-impact.de/assets/logo.svg",
+    "image":"https://quick-impact.de/assets/og/og-1200x630.png",
+    "description":"Maßgeschneiderte Excel/Access-Automationen, Dashboards und Web-/Mobile-Apps für KMU – mit Festpreisen, kurzer Time-to-Value und KVP-Ansatz.",
+    "address":{"@type":"PostalAddress","addressLocality":"Berlin","addressCountry":"DE"},
+    "areaServed":"DE",
+    "inLanguage":"de-DE"
   }
   </script>
+
+  <!-- WebSite -->
   <script type="application/ld+json">
   {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "url": "https://www.quick-impact.de/",
-    "name": "Quick Impact Programming",
-    "inLanguage": "de-DE"
+    "@context":"https://schema.org",
+    "@type":"WebSite",
+    "url":"https://quick-impact.de/",
+    "name":"Quick Impact Programming",
+    "inLanguage":"de-DE",
+    "potentialAction":{
+      "@type":"SearchAction",
+      "target":"https://quick-impact.de/?q={search_term_string}",
+      "query-input":"required name=search_term_string"
+    }
   }
   </script>
+
+  <!-- ContactPage (Kontakt-Sektion) -->
   <script type="application/ld+json">
   {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {"@type":"Question","name":"Wie schnell können wir starten?","acceptedAnswer":{"@type":"Answer","text":"Nach dem Potenzial‑Call definieren wir Ihren ersten Use‑Case. Der Prototyp liegt in der Regel nach 1–2 Wochen vor."}},
+    "@context":"https://schema.org",
+    "@type":"ContactPage",
+    "url":"https://quick-impact.de/#kontakt",
+    "name":"Kontakt – Quick Impact Programming",
+    "description":"Kontaktieren Sie uns für Automationen, Dashboards und Web-/Mobile-Apps zum Festpreis.",
+    "inLanguage":"de-DE"
+  }
+  </script>
+
+  <!-- FAQPage (falls du die FAQ auf der Startseite hast) -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"FAQPage",
+    "mainEntity":[
+      {"@type":"Question","name":"Wie schnell können wir starten?","acceptedAnswer":{"@type":"Answer","text":"Nach dem Potenzial-Call definieren wir Ihren ersten Use-Case. Der Prototyp liegt in der Regel nach 1–2 Wochen vor."}},
       {"@type":"Question","name":"Müssen wir neue Lizenzen kaufen?","acceptedAnswer":{"@type":"Answer","text":"Nur wenn es sinnvoll ist. Wir nutzen Ihre vorhandenen Tools und ergänzen schlank. Unser Anspruch: lizenzarm und wartbar."}},
-      {"@type":"Question","name":"Wie stellen Sie Qualität & Wartbarkeit sicher?","acceptedAnswer":{"@type":"Answer","text":"Klare Datenmodelle, saubere Schnittstellen, Tests & Doku. Außerdem: KVP mit kurzen Feedback‑Loops."}},
-      {"@type":"Question","name":"Unterstützen Sie auch nach dem Go‑Live?","acceptedAnswer":{"@type":"Answer","text":"Ja – optionales, transparentes Wartungspaket oder Übergabe an Ihr Team inkl. Schulung."}}
+      {"@type":"Question","name":"Wie stellen Sie Qualität & Wartbarkeit sicher?","acceptedAnswer":{"@type":"Answer","text":"Klare Datenmodelle, saubere Schnittstellen, Tests & Doku. Außerdem: KVP mit kurzen Feedback-Loops."}},
+      {"@type":"Question","name":"Unterstützen Sie auch nach dem Go-Live?","acceptedAnswer":{"@type":"Answer","text":"Ja – optionales, transparentes Wartungspaket oder Übergabe an Ihr Team inkl. Schulung."}}
     ]
   }
   </script>
+
 
 </head><body>
   <div class='bg-canvas' aria-hidden='true'></div>

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.quickimpact-programming.example/sitemap.xml
+Sitemap: https://quick-impact.de/sitemap.xml
