@@ -1,7 +1,14 @@
 /* Team Slider v4 (dots only) */
 .team{margin-top:1.6rem}
 .team-title{margin:.6rem 0 1rem}
-.teamv3{position:relative;margin-top:.6rem;display:grid;grid-template-rows:auto 36px;row-gap:.7rem;align-items:start}
+.teamv3{
+  position:relative;
+  margin-top:.6rem;
+  display:grid;
+  grid-template-rows:auto; /* nur noch eine Zeile */
+  row-gap:.7rem;
+  align-items:start;
+}
 .tv3-viewport{position:relative;overflow:visible;min-height:280px;transition:height .25s ease;height:auto}
 .tv3-slide{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;pointer-events:none}
 .tv3-slide.active{opacity:1;pointer-events:auto}
@@ -54,4 +61,6 @@
   .teamv3 .tv3-figure{max-width:220px !important; margin-left:auto !important; margin-right:auto !important; justify-self:center !important; text-align:center;}
   .teamv3 .tv3-figure img{margin-left:auto; margin-right:auto;}
 }
+/* Dots komplett ausblenden (Safety-Guard) */
+.tv3-dots{ display:none !important; }
 

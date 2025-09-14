@@ -1,5 +1,4 @@
-// js/components/teamSlider.js — robust drop‑in
-// Idempotent, DOM‑safe, creates dots if missing, auto‑slide, swipe, auto‑height.
+// js/components/teamSlider.js — NO DOTS (arrows only), auto-slide, swipe, auto-height
 
 let __tsInitialized = false;
 let __tsTimer = null;
@@ -7,50 +6,27 @@ let __tsTimer = null;
 export function initTeamSlider(){
   if (__tsInitialized) return;
 
-  // Accept multiple root selectors for robustness
+  // Root finden (robust)
   const root = document.querySelector('#teamv3, .team-slider, [data-team-slider], #team, #teamCarousel, #team-slider-root');
   if (!root) return;
 
-  // Viewport detection (fallbacks allowed)
+  // Viewport + Slides
   const viewport = root.querySelector('.tv3-viewport, .team-viewport, .slider-viewport');
   if (!viewport) return;
 
   const slides = Array.from(viewport.querySelectorAll('.tv3-slide, .team-slide, .slide'));
   if (!slides.length) return;
 
-  // Ensure dots container
-  let dotsWrap = root.querySelector('.tv3-dots, .team-dots, .slider-dots');
-  if (!dotsWrap) {
-    dotsWrap = document.createElement('div');
-    dotsWrap.className = 'tv3-dots';
-    // Place after viewport if possible
-    if (viewport.parentNode) {
-      viewport.parentNode.insertBefore(dotsWrap, viewport.nextSibling);
-    } else {
-      root.appendChild(dotsWrap);
-    }
-  } else {
-    // Clear previous if any
-    dotsWrap.innerHTML = '';
-  }
+  // Pfeile
+  const prevBtn = root.querySelector('.tv3-arrow.prev');
+  const nextBtn = root.querySelector('.tv3-arrow.next');
 
-  // Build dots
-  slides.forEach((_, i) => {
-    const b = document.createElement('button');
-    b.className = 'dot';
-    b.type = 'button';
-    b.setAttribute('aria-label', 'Folie ' + (i + 1));
-    b.addEventListener('click', () => { goto(i); restart(); });
-    dotsWrap.appendChild(b);
-  });
-  const dotEls = Array.from(dotsWrap.querySelectorAll('.dot'));
-
+  // ---- State ----
   let index = 0;
   let running = true;
 
   function setActive(i){
     slides.forEach((s, si) => s.classList.toggle('active', si === i));
-    dotEls.forEach((d, di) => d.classList.toggle('active', di === i));
     updateHeight();
   }
   function goto(i){ index = (i + slides.length) % slides.length; setActive(index); }
@@ -60,21 +36,25 @@ export function initTeamSlider(){
   function stop(){ if (__tsTimer){ clearInterval(__tsTimer); __tsTimer = null; } }
   function restart(){ stop(); start(); }
 
-  // Pause on hover/focus
+  // Pfeil-Events
+  if (prevBtn) prevBtn.addEventListener('click', () => { goto(index - 1); restart(); });
+  if (nextBtn) nextBtn.addEventListener('click', () => { next(); restart(); });
+
+  // Hover/Focus pausiert
   root.addEventListener('pointerenter', () => { running = false; });
   root.addEventListener('pointerleave', () => { running = true; });
   root.addEventListener('focusin',       () => { running = false; });
   root.addEventListener('focusout',      () => { running = true; });
 
-  // Only run when visible
+  // Nur laufen, wenn sichtbar
   try {
     const io = new IntersectionObserver((ents) => {
       ents.forEach(en => { running = en.isIntersecting; });
     }, { threshold: .15 });
     io.observe(root);
-  } catch(e){ /* older browsers */ }
+  } catch(e){ /* ältere Browser */ }
 
-  // Swipe support (pointer events)
+  // Swipe
   let sx = 0, dx = 0, swiping = false;
   viewport.addEventListener('pointerdown', (e) => {
     swiping = true; sx = e.clientX;
@@ -88,7 +68,7 @@ export function initTeamSlider(){
   });
   viewport.addEventListener('pointermove', (e) => { if (swiping) dx = e.clientX - sx; });
 
-  // Auto-height from active slide
+  // Auto-Höhe anhand aktiver Slide
   function updateHeight(){
     const active = slides[index];
     if (!active) return;
@@ -111,7 +91,7 @@ export function initTeamSlider(){
   __tsInitialized = true;
 }
 
-// Legacy global API (in case main.js calls Module/TeamSlider)
+// Legacy global (falls main.js es so aufruft)
 if (typeof window !== 'undefined') {
   window.TeamSlider = window.TeamSlider || {};
   window.TeamSlider.initTeamSlider = initTeamSlider;
