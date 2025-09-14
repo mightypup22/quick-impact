@@ -54,18 +54,5 @@
         }
       ]
     }
-  ],
-  "redirects": [
-    {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.quick-impact.de"
-        }
-      ],
-      "destination": "https://quick-impact.de/$1",
-      "permanent": true
-    }
   ]
 }
