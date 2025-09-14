@@ -40,7 +40,7 @@
 }
 .tv3-viewport{position:relative;overflow:visible;min-height:280px;transition:height .25s ease;height:auto}
 
-.tv3-controls{display:flex;align-items:center;justify-content:center;gap:2rem;height:36px margin-top:10px; }
+.tv3-controls{display:flex;align-items:center;justify-content:center;gap:2rem;height:36px margin-top:20px; }
 .tv3-arrow{background:transparent;border:none;cursor:pointer;padding:.25rem;line-height:0;opacity:.9;transition:opacity .15s ease, transform .1s ease}
 .tv3-arrow:hover{opacity:1;transform:translateY(-1px)}
 .tv3-arrow:active{transform:translateY(0)}
