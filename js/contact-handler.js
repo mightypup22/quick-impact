@@ -113,7 +113,9 @@
         event: 'leadFormSubmitted',
         formName: 'Kontakt',
         formId: (form.id || 'contact-form'),
-        formLocation: window.location.pathname
+        formLocation: window.location.pathname,
+        email: form.querySelector('#email')?.value,
+        name: form.querySelector('#name')?.value
       });
       // <<< Ende GTM Block
     })
