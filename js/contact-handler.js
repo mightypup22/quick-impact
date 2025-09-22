@@ -67,14 +67,13 @@
 
     // basic validation
     if (!payload.name || !payload.email || !payload.message){
-      show(form, 'Bitte Name, E‑Mail und Anliegen ausfüllen.', true);
+      show(form, 'Bitte Name, E-Mail und Anliegen ausfüllen.', true);
       return;
     }
     if (!payload.consent){
       if (consentField) consentField.classList.add('invalid');
       show(form, 'Bitte Einwilligung bestätigen.', true);
       try{ consentEl && consentEl.focus(); }catch(_){}
-      // listen once to clear the error state
       try{
         consentEl && consentEl.addEventListener('change', () => {
           consentField && consentField.classList.remove('invalid');
@@ -107,10 +106,23 @@
       form.reset();
       if (consentField) consentField.classList.remove('invalid');
       show(form, 'Vielen Dank! Ihre Nachricht wurde gesendet. Wir melden uns zeitnah.', false);
+
+      // >>> GTM Conversion Event (NUR bei echtem Erfolg)
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'leadFormSubmitted',
+        formName: 'Kontakt',
+        formId: (form.id || 'contact-form'),
+        formLocation: window.location.pathname
+      });
+      // <<< Ende GTM Block
     })
     .catch((err) => {
       console.error('[contact-handler v6] send error', err);
       show(form, 'Leider konnte die Nachricht nicht gesendet werden. Bitte versuchen Sie es später erneut.', true);
+      // Optional: Fehler-Event fürs Debugging
+      // window.dataLayer = window.dataLayer || [];
+      // window.dataLayer.push({ event: 'leadFormError' });
     })
     .finally(() => { if (revert) revert(); });
   }, { capture: true, passive: false });
