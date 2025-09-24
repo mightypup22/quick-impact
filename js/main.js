@@ -61,9 +61,9 @@
 // main.js (ES module)
 const CONFIG={
   brandName:'Quick Impact Programming',
-  contactEmail:'hello@quickwin-solutions.example',
-  phone:'+49 000 000000',
-  address:'Musterstraße 1, 12345 Musterstadt'
+  contactEmail:'kontakt@quick-impact.de',
+  phone:'+49 30 234 56 880',
+  address:'Schöneberger Ufer 73, 10785 Berlin'
 };
 
 async function loadComponents(){
@@ -83,7 +83,11 @@ async function loadComponents(){
       slot.replaceWith(fallback);
     }
   }));
+
+  // <- HIER: Signal senden, dass alle Includes fertig sind
+  window.dispatchEvent(new Event('includes:ready'));
 }
+
 
 function initHeader(){
   const burger=document.getElementById('burger'); const nav=document.getElementById('nav');

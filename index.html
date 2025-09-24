@@ -1,4 +1,15 @@
 <!doctype html><html lang="de"><head>
+  <!-- Banner -->
+  <script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  // Default: alles denied, bis der Nutzer entscheidet
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    analytics_storage: 'denied',
+    wait_for_update: 500
+  });
+  </script>
   <!-- Google tag (gtag.js)
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17589257568"></script>
   <script>
@@ -60,6 +71,7 @@
   <script type="module" src="js/main.js" defer></script>
   <script src="js/anchors.smart.js" defer></script>
   <script src="js/contact-handler.js?v=6" defer></script>
+  <script src="/js/banner.js" defer></script>
 
   <!-- ProfessionalService -->
   <script type="application/ld+json">
@@ -180,7 +192,7 @@
     <div data-include="components/kontakt.html"></div>
   </main>
   <div data-include="components/footer.html"></div>
-
+  <div data-include="components/banner.html"></div>
   <noscript>
     <div style="padding:1rem; text-align:center; color:#fff; background:#b91c1c">
       Bitte JavaScript aktivieren. Diese Seite lädt Inhalte modular per JS.
