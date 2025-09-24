@@ -61,48 +61,74 @@
 
   // ---- SECTION-VIEWS ---------------------------------------------------------
   // robuster Selektor: akzeptiert <section id="…"> sowie beliebige Elemente mit id + data-section-name
-  const SECTION_SELECTOR = 'section[id], [data-section-name][id], [data-track="section"][id]';
+  // robuster Selektor bleibt
+const SECTION_SELECTOR = 'section[id], [data-section-name][id], [data-track="section"][id]';
 
-  let sectionIO = null;
-  const seenSections = new Set(); // nur pushen, wenn noch nicht gemeldet
+let sectionIO = null;
+const seenSections = new Set();
 
-  function setupSectionObserver() {
-    if (sectionIO) sectionIO.disconnect();
+// Sichtbarkeitsprüfung (Fallback)
+function isVisibleEnough(el, minRatio = 0.15) {
+  const r = el.getBoundingClientRect();
+  const vh = window.innerHeight || document.documentElement.clientHeight;
+  if (vh <= 0) return false;
+  const top = Math.max(0, r.top);
+  const bottom = Math.min(vh, r.bottom);
+  const visible = Math.max(0, bottom - top);
+  const ratio = visible / Math.max(1, r.height);
+  return ratio >= minRatio;
+}
+
+function reportIfEligible(el) {
+  const id = el.id || 'unknown';
+  if (!consentGranted) return;              // nur mit Consent senden
+  if (seenSections.has(id)) return;         // schon gemeldet?
+  if (!isVisibleEnough(el, 0.15)) return;   // Fallback-Check
+
+  const niceName =
+    el.getAttribute('data-section-name') ||
+    NAME_BY_ID[id] || id;
+
+  seenSections.add(id);
+  pushWithConsent({
+    event: 'sectionView',
+    sectionId: id,
+    sectionName: niceName
+  });
+}
+
+function setupSectionObserver() {
+  if (sectionIO) sectionIO.disconnect();
+
+  const sections = Array.from(document.querySelectorAll(SECTION_SELECTOR));
+  if (!sections.length) return;
+
+  sectionIO = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      // toleranter + Sticky-Header berücksichtigen
+      if (entry.intersectionRatio < 0.15) return;
+      reportIfEligible(entry.target);
+    });
+  }, { threshold: [0, 0.15, 0.3], rootMargin: '12% 0px -12% 0px' });
+
+  sections.forEach(s => sectionIO.observe(s));
+
+  // Falls eine Section schon beim Setup sichtbar ist (z. B. "Über uns" knapp unter Hero)
+  if (consentGranted) {
+    sections.forEach(s => reportIfEligible(s));
+  }
+}
+
+// nach Consent auch sichtbare Sections sofort melden
+function reobserveSections() {
+  setupSectionObserver();
+  if (consentGranted) {
     const sections = Array.from(document.querySelectorAll(SECTION_SELECTOR));
-    if (!sections.length) return;
-
-    sectionIO = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting || entry.intersectionRatio < 0.3) return;
-
-        const id = entry.target.id || 'unknown';
-        if (seenSections.has(id)) return; // schon gemeldet
-
-        // ohne Consent NICHT als gesehen markieren, damit wir nach Zustimmung pushen können
-        if (!consentGranted) return;
-
-        const niceName =
-          entry.target.getAttribute('data-section-name') ||
-          NAME_BY_ID[id] ||
-          id;
-
-        seenSections.add(id);
-        pushWithConsent({
-          event: 'sectionView',      // GTM-Trigger-Event (benutzerdefiniertes Ereignis)
-          sectionId: id,             // DLV – sectionId
-          sectionName: niceName      // DLV – sectionName
-        });
-      });
-    }, { threshold: [0.3], rootMargin: '0px 0px -10% 0px' });
-
-    sections.forEach(s => sectionIO.observe(s));
+    sections.forEach(s => reportIfEligible(s));
   }
+}
 
-  // Re-Observe forcieren (z. B. direkt nach Consent), damit initial sichtbare Section gemeldet wird
-  function reobserveSections(){
-    // Observer neu anlegen (triggert initiale Entries)
-    setupSectionObserver();
-  }
 
   // ---- SCROLL-PROGRESS ------------------------------------------------------
   const marks = [25, 50, 75, 90];
