@@ -1,9 +1,55 @@
 // /js/GA4.js
 (function () {
-  if (window.qiGA4Init) return; // Doppel-Init verhindern (bei Hot Reload etc.)
+  if (window.qiGA4Init) return; // Doppel-Init verhindern
   window.qiGA4Init = true;
 
-  // Sprechende Namen für Section-IDs (optional anpassen)
+  // ---- Consent-Verwaltung ---------------------------------------------------
+  const CONSENT_LS_KEY = 'qi-consent-v1';
+  let consentGranted = (typeof localStorage !== 'undefined' && localStorage.getItem(CONSENT_LS_KEY) === 'granted');
+
+  // DataLayer-Hook: fange consent_update aus dem Banner ab
+  (function hookConsentFromDataLayer(){
+    const dl = (window.dataLayer = window.dataLayer || []);
+    const originalPush = Array.isArray(dl.push) ? dl.push : null;
+    dl.push = function(){
+      for (const arg of arguments) {
+        if (arg && arg.event === 'consent_update' && arg.consent === 'granted') {
+          onConsentGranted();
+        }
+      }
+      return originalPush ? originalPush.apply(this, arguments) : 0;
+    };
+  })();
+
+  function onConsentGranted(){
+    if (consentGranted) return;
+    consentGranted = true;
+    // bereits gebufferte Events senden
+    flushQueue();
+    // Scroll-Marken erneut auswerten & senden
+    firedMarks.clear();
+    onScroll();
+    // Sections mit aktuellem Viewport erneut bewerten
+    reobserveSections();
+  }
+
+  // ---- DataLayer helper mit Consent-Queue -----------------------------------
+  const pendingQueue = [];
+  function pushDL(obj) {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(obj);
+  }
+  function pushWithConsent(obj){
+    if (!consentGranted) { pendingQueue.push(obj); return; }
+    pushDL(obj);
+  }
+  function flushQueue(){
+    if (!pendingQueue.length) return;
+    // alles auf einen Schlag senden (Reihenfolge beibehalten)
+    while (pendingQueue.length) pushDL(pendingQueue.shift());
+  }
+
+  // ---- Optionale hübsche Namen für Sections ---------------------------------
   const NAME_BY_ID = {
     // "leistungen": "Leistungen",
     // "kompetenzen": "Kompetenzen",
@@ -13,36 +59,36 @@
     // "kontakt": "Kontakt"
   };
 
-  // DataLayer helper
-  function pushDL(obj) {
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push(obj);
-  }
+  // ---- SECTION-VIEWS ---------------------------------------------------------
+  // robuster Selektor: akzeptiert <section id="…"> sowie beliebige Elemente mit id + data-section-name
+  const SECTION_SELECTOR = 'section[id], [data-section-name][id], [data-track="section"][id]';
 
-  // ---------- SECTION-VIEWS ----------
   let sectionIO = null;
-  const seenSections = new Set();
-  function initSectionObserver() {
-    // vorhandenen Observer ggf. aufräumen
-    if (sectionIO) { sectionIO.disconnect(); sectionIO = null; }
+  const seenSections = new Set(); // nur pushen, wenn noch nicht gemeldet
 
-    const sections = Array.from(document.querySelectorAll('section[id]'));
+  function setupSectionObserver() {
+    if (sectionIO) sectionIO.disconnect();
+    const sections = Array.from(document.querySelectorAll(SECTION_SELECTOR));
     if (!sections.length) return;
 
     sectionIO = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (!entry.isIntersecting || entry.intersectionRatio < 0.5) return;
-        const id = entry.target.id;
-        if (seenSections.has(id)) return;
-        seenSections.add(id);
+        if (!entry.isIntersecting || entry.intersectionRatio < 0.3) return;
+
+        const id = entry.target.id || 'unknown';
+        if (seenSections.has(id)) return; // schon gemeldet
+
+        // ohne Consent NICHT als gesehen markieren, damit wir nach Zustimmung pushen können
+        if (!consentGranted) return;
 
         const niceName =
           entry.target.getAttribute('data-section-name') ||
           NAME_BY_ID[id] ||
           id;
 
-        pushDL({
-          event: 'sectionView',      // <- Trigger-Eventname in GTM
+        seenSections.add(id);
+        pushWithConsent({
+          event: 'sectionView',      // GTM-Trigger-Event (benutzerdefiniertes Ereignis)
           sectionId: id,             // DLV – sectionId
           sectionName: niceName      // DLV – sectionName
         });
@@ -52,9 +98,16 @@
     sections.forEach(s => sectionIO.observe(s));
   }
 
-  // ---------- SCROLL-PROGRESS ----------
-  const marks = [25, 50, 75, 90];   // gewünschte Marken
-  const firedMarks = new Set();      // global pro Pageview nur einmal
+  // Re-Observe forcieren (z. B. direkt nach Consent), damit initial sichtbare Section gemeldet wird
+  function reobserveSections(){
+    // Observer neu anlegen (triggert initiale Entries)
+    setupSectionObserver();
+  }
+
+  // ---- SCROLL-PROGRESS ------------------------------------------------------
+  const marks = [25, 50, 75, 90];
+  const firedMarks = new Set(); // pro Pageview nur einmal je Marke
+
   function computeScrollPercent() {
     const doc = document.documentElement;
     const scrollTop = window.scrollY || doc.scrollTop || 0;
@@ -68,15 +121,20 @@
     return Math.round(((scrollTop + winH) / docH) * 100);
   }
 
+  function pushScroll(percent){
+    if (!consentGranted) return; // vor Consent nichts senden
+    pushWithConsent({
+      event: 'scrollProgress', // GTM-Trigger-Event (benutzerdefiniertes Ereignis)
+      scrollPercent: percent   // DLV – scrollPercent
+    });
+  }
+
   function onScroll() {
     const pct = computeScrollPercent();
     marks.forEach((m) => {
       if (pct >= m && !firedMarks.has(m)) {
         firedMarks.add(m);
-        pushDL({
-          event: 'scrollProgress',   // <- Trigger-Eventname in GTM
-          scrollPercent: m           // DLV – scrollPercent
-        });
+        pushScroll(m);
       }
     });
   }
@@ -92,35 +150,31 @@
 
   function initScrollTracking() {
     window.addEventListener('scroll', throttledScroll, { passive: true });
-    // Initial für kurze Seiten
-    onScroll();
+    // initial nur ausführen, wenn bereits Consent vorliegt
+    if (consentGranted) onScroll();
   }
 
-  // ---------- BOOTSTRAP ----------
-  function tryInit() {
-    initSectionObserver();
+  // ---- BOOTSTRAP ------------------------------------------------------------
+  function initAll() {
+    setupSectionObserver();
     initScrollTracking();
   }
 
-  // Init, wenn DOM bereit
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', tryInit);
+    document.addEventListener('DOMContentLoaded', initAll);
   } else {
-    tryInit();
+    initAll();
   }
 
   // Warten auf asynchron geladene Components
   window.addEventListener('includes:ready', () => {
-    // Sections könnten erst jetzt im DOM sein
-    initSectionObserver();
+    setupSectionObserver();
+    if (consentGranted) onScroll();
   });
 
-  // Fallback: falls Includes anders injiziert werden
+  // Fallback bei dynamischen DOM-Änderungen
   try {
-    const mo = new MutationObserver(() => {
-      // Wenn neue <section id="…"> auftauchen, erneut verbinden
-      initSectionObserver();
-    });
+    const mo = new MutationObserver(() => { setupSectionObserver(); });
     mo.observe(document.documentElement, { childList: true, subtree: true });
   } catch (_) {}
 })();
