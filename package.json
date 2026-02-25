@@ -1,0 +1,7 @@
+{
+  "name": "quick-impact",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/prerender.js"
+  }
+}
